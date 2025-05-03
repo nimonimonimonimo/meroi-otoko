@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -107,6 +108,7 @@
     let current = 0;
     let score = 0;
     let resultText = "";
+    let resultLabel = "";
 
     const quiz = document.getElementById("quiz");
     const result = document.getElementById("result");
@@ -116,6 +118,7 @@
       current = 0;
       score = 0;
       resultText = "";
+      resultLabel = "";
       showQuestion();
     }
 
@@ -126,7 +129,7 @@
       }
       quiz.innerHTML = `
         <div class="question">
-          <p>Q${current + 1}. ${questions[current]}</p>
+          <p>${questions[current]}</p>
           <button onclick="answer(5)">はい</button>
           <button onclick="answer(3)">わからない</button>
           <button onclick="answer(0)">いいえ</button>
@@ -142,37 +145,30 @@
 
     function showResult() {
       quiz.innerHTML = "";
-      let message = "";
       let comment = "";
 
       if (score <= 30) {
-        message = "🧊ふつうにいいやつ";
+        resultLabel = "🧊ふつうにいいやつ";
         comment = "なんか安心する。\n無理しない距離感で接してくれるし、\nLINEも既読無視じゃなくて“気づいたら返ってる”タイプ。\n付き合ったら平和で、たぶん浮気もない。\nでも恋のスリルは、あんまりないかも。";
       } else if (score <= 60) {
-        message = "🍵気になる人ポジ";
+        resultLabel = "🍵気になる人ポジ";
         comment = "「あれ？ この人ちょっと特別かも？」って\n気づいたら考えちゃう存在。\n深夜にポンっとDMが来ると、\nなにげない話なのに眠れなくなる。\nたぶん付き合う前が一番ドキドキするタイプ。";
       } else if (score <= 85) {
-        message = "🎧ゆる沼予備軍";
+        resultLabel = "🎧ゆる沼予備軍";
         comment = "なんでもない会話の中に急に刺さる一言を落としてくる。\n深読みしちゃうの、わかってるくせに。\nDMでちょっと悩み相談されると、\n「これは私だけが知ってる顔だ」って勘違いさせられる。\n好きになったら抜け出せない、沼の入り口。";
       } else {
-        message = "🫖完全沼らせメロ男";
+        resultLabel = "🫖完全沼らせメロ男";
         comment = "会話のテンポ、間の取り方、全部が恋。\nわざとじゃないのに、毎回こっちの感情をぐらぐら揺らしてくる。\n言葉より沈黙で伝えてくる系の、危うさ。\nそれでも話したくなるし、会いたくなる。\nもう既にちょっと、あなたが特別だってわかってる。";
       }
 
-      resultText = `あなたの診断結果：\n${message}\n\n女の子視点コメント：\n「${comment}」`;
-      result.innerText = resultText.replace(/\n/g, '<br>');
+      resultText = "あなたの診断結果：\n" + resultLabel + "\nスコア：" + score + " / 100" + "\n\n女の子視点コメント：\n「" + comment + "」";
+      result.innerHTML = resultText.replace(/\n/g, '<br>');
       result.style.display = "block";
 
-      share.innerHTML = `
-        <button onclick="shareResult()">Xでシェアする</button>
-      `;
-    }
+      const tweetContent = resultLabel + "\nスコア：" + score + " / 100" + "\n「" + comment + "」\n診断はこちら→ https://nimonimonimonimo.github.io/meroi-otoko/\n#メロい男診断";
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetContent)}`;
 
-    function shareResult() {
-      const text = encodeURIComponent(resultText + "\n#メロい男診断");
-      const url = encodeURIComponent(window.location.href);
-      const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-      window.open(shareUrl, "_blank");
+      share.innerHTML = `<button onclick="window.open('${tweetUrl}', '_blank')">Xでシェアする</button>`;
     }
 
     showQuestion();
