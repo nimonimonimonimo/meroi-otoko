@@ -25,7 +25,10 @@
       background: #2a2a2a;
       padding: 2em 1.5em;
       border-radius: 16px;
-      box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+      box-shadow:
+    0 0 30px rgba(255, 105, 180, 0.25),
+    0 0 60px rgba(255, 182, 193, 0.2),
+    0 0 90px rgba(255, 105, 180, 0.15);
       box-sizing: border-box;
     }
     #scene {
@@ -211,7 +214,7 @@
             result.innerText = badEndTexts[choice.badReason];
             share.style.display = "inline-block";
             share.onclick = () => {
-              const text = encodeURIComponent(`メロい男診断やってみたらBAD ENDだった… #メロ男サバイバル\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
+              const text = encodeURIComponent(`メロい男診断やってみたらBAD ENDだった… #メロ男 #診断ゲーム\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
               window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
             };
           } else if (choice.ending) {
@@ -230,7 +233,7 @@
 誰かの脳内劇場の主演になった。`;
             share.style.display = "inline-block";
             share.onclick = () => {
-              const text = encodeURIComponent(`メロい男診断、完全沼らせメロ男に到達した🫖 #メロ男サバイバル\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
+              const text = encodeURIComponent(`メロい男診断、完全沼らせメロ男に到達した🫖 #メロ男 #診断ゲーム\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
               window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
             };
           }
