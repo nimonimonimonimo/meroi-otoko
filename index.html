@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メロい男診断</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background: linear-gradient(to bottom, #ffe6f0, #fff);
+      color: #333;
+      padding: 2em;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1em;
+      color: #c94f7c;
+    }
+    .question, .intro {
+      margin-bottom: 1.8em;
+      background: #ffffffcc;
+      padding: 1em;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(201, 79, 124, 0.2);
+    }
+    .question p, .intro p {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    button {
+      margin: 0.4em;
+      padding: 0.6em 1.2em;
+      border: none;
+      border-radius: 8px;
+      background: #ffe6ec;
+      cursor: pointer;
+      font-size: 1em;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #ffd1de;
+    }
+    #result {
+      display: none;
+      font-size: 1.2em;
+      margin-top: 2em;
+      padding: 1.5em;
+      border-radius: 12px;
+      background: #fff0f5;
+      box-shadow: 0 0 12px rgba(201, 79, 124, 0.3);
+    }
+    #share {
+      margin-top: 1em;
+    }
+    #share button {
+      background: #1da1f2;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>メロい男診断</h1>
+  <div id="quiz">
+    <div class="intro">
+      <p>君は、ちょっと年下で、ちょっと繊細で、<br>
+      音楽とか映画とか、偏ったこだわりがあって。<br><br>
+      でも、<br>
+      「一緒に寝たい」とは言わないくせに、<br>
+      「最近眠れてなくて」って言ってくるよね。<br><br>
+      その言い方、<br>
+      ぜんぶ地雷女を燃やすのわかってる？</p>
+      <button onclick="startQuiz()">診断をはじめる</button>
+    </div>
+  </div>
+  <div id="result"></div>
+  <div id="share"></div>
+
+  <script>
+    const questions = [
+      "今日◯◯と会ってたよ”って言わずに、部屋の壁だけ写したストーリー上げたことある。",
+      "「それ、誰にでも言ってる？」って聞いたことがある。",
+      "好きな作品の話になると、少し早口になるのを自覚している。",
+      "“何してるの？”の代わりに“起きてた？”って送ったことがある。",
+      "DMで “いま 誰といるの？” って送るか悩んだことがある。",
+      "既読はつけたのに、返す内容を考えてるうちに1日経ったことがある。",
+      "「寝落ちしてた」って嘘をついたことがある。",
+      "写真を送るとき、手とか首元だけ見える構図にしたことがある。",
+      "「俺のこと嫌いになった？」って突然送ったことがある。",
+      "ストーリーにだけリアクションして、あえてDMは送らない。",
+      "「あの子といるときの君、ちょっと違うよね」って言ったことがある。",
+      "自分の好きなジャンルの話をされると急に静かになる。",
+      "「それ、誰にでも優しいの？」って聞きたくなる時がある。",
+      "過去のポストを遡って、特定の人のいいねを確認したことがある。",
+      "映画の感想を語るとき「観た人にしかわからないけど」から始めがち。",
+      "DMで相談されると、返信文を5回くらい書き直す。",
+      "「そういうとこ、ほんと危なっかしいよ」って言ったことがある。",
+      "推しの話より、推しを語る君のほうが気になる。",
+      "“なにしてた？”より、“ひとりだった？”って聞いてしまう。",
+      "「返信くれると安心する」って何気なく言ったことがある。"
+    ];
+
+    let current = 0;
+    let score = 0;
+    let resultText = "";
+
+    const quiz = document.getElementById("quiz");
+    const result = document.getElementById("result");
+    const share = document.getElementById("share");
+
+    function startQuiz() {
+      current = 0;
+      score = 0;
+      resultText = "";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (current >= questions.length) {
+        showResult();
+        return;
+      }
+      quiz.innerHTML = `
+        <div class="question">
+          <p>Q${current + 1}. ${questions[current]}</p>
+          <button onclick="answer(5)">はい</button>
+          <button onclick="answer(3)">わからない</button>
+          <button onclick="answer(0)">いいえ</button>
+        </div>
+      `;
+    }
+
+    function answer(points) {
+      score += points;
+      current++;
+      showQuestion();
+    }
+
+    function showResult() {
+      quiz.innerHTML = "";
+      let message = "";
+      let comment = "";
+
+      if (score <= 30) {
+        message = "🧊ふつうにいいやつ";
+        comment = "なんか安心する。\n無理しない距離感で接してくれるし、\nLINEも既読無視じゃなくて“気づいたら返ってる”タイプ。\n付き合ったら平和で、たぶん浮気もない。\nでも恋のスリルは、あんまりないかも。";
+      } else if (score <= 60) {
+        message = "🍵気になる人ポジ";
+        comment = "「あれ？ この人ちょっと特別かも？」って\n気づいたら考えちゃう存在。\n深夜にポンっとDMが来ると、\nなにげない話なのに眠れなくなる。\nたぶん付き合う前が一番ドキドキするタイプ。";
+      } else if (score <= 85) {
+        message = "🎧ゆる沼予備軍";
+        comment = "なんでもない会話の中に急に刺さる一言を落としてくる。\n深読みしちゃうの、わかってるくせに。\nDMでちょっと悩み相談されると、\n「これは私だけが知ってる顔だ」って勘違いさせられる。\n好きになったら抜け出せない、沼の入り口。";
+      } else {
+        message = "🫖完全沼らせメロ男";
+        comment = "会話のテンポ、間の取り方、全部が恋。\nわざとじゃないのに、毎回こっちの感情をぐらぐら揺らしてくる。\n言葉より沈黙で伝えてくる系の、危うさ。\nそれでも話したくなるし、会いたくなる。\nもう既にちょっと、あなたが特別だってわかってる。";
+      }
+
+      resultText = `あなたの診断結果：\n${message}\n\n女の子視点コメント：\n「${comment}」`;
+      result.innerText = resultText.replace(/\n/g, '<br>');
+      result.style.display = "block";
+
+      share.innerHTML = `
+        <button onclick="shareResult()">Xでシェアする</button>
+      `;
+    }
+
+    function shareResult() {
+      const text = encodeURIComponent(resultText + "\n#メロい男診断");
+      const url = encodeURIComponent(window.location.href);
+      const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+      window.open(shareUrl, "_blank");
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
