@@ -1,12 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>メロい男・選択型ノベル診断</title>
+  <title>メロい男サバイバルゲーム</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap');
-
     body {
       background-color: #1a1a1a;
       color: #f0f0f0;
@@ -19,7 +19,6 @@
       padding: 2em;
       margin: 0;
     }
-
     #container {
       width: 100%;
       max-width: 480px;
@@ -29,14 +28,12 @@
       box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
       box-sizing: border-box;
     }
-
     #scene {
       font-size: 1.1em;
       margin-bottom: 1.5em;
       line-height: 1.7;
       text-align: center;
     }
-
     .choice {
       background: #333;
       color: #fff;
@@ -49,12 +46,10 @@
       text-align: center;
       box-sizing: border-box;
     }
-
     .choice:hover {
       background: #ffb3d9;
       color: #000;
     }
-
     #result {
       font-size: 1.3em;
       margin-top: 2em;
@@ -62,7 +57,6 @@
       text-align: center;
       white-space: pre-line;
     }
-
     #shareButton {
       margin-top: 1.5em;
       background: #1da1f2;
@@ -76,14 +70,12 @@
       width: 100%;
       box-sizing: border-box;
     }
-
     #loading {
       font-size: 1.2em;
       color: #ccc;
       margin-bottom: 2em;
       text-align: center;
     }
-
     #popup {
       position: fixed;
       top: 20px;
@@ -112,8 +104,18 @@
   <div id="popup">✓ クリア！</div>
 
   <script>
+    const badEndTexts = {
+      1: "『起きてる？』が直球すぎた。余白を読ませる時間を、君は自分で閉じた。",
+      2: "『そうだよ』って言葉、うれしいけど、答え合わせされた時点で恋は止まる。",
+      3: "眠くなって先に落ちたら、沈黙の魔法が解けてしまうんだよ。",
+      4: "その写真、“誰か”が見えた時点で、私はスクリーンの外に追い出された。",
+      5: "『また行こう』はうれしい。でもそれ、誰にでも言えるよね？",
+      6: "説明してしまったら、それは夢じゃなくなるの。全部“現実”になってしまう。",
+      7: "なにも言わずに静かな朝をくれたら…まだ少し夢の中にいられたのに。"
+    };
+
     const story = [
-    {
+      {
         text: "\n\n── メロい男・選択型診断 ──\n\n\n君は気づいていない。\nその一言が、\nその返信が、\n誰かの一日を占領していることに。\n\n選択を間違えればすべてが終わる。\nでも最後までたどり着けたとき、\n君は “完全沼らせメロ男” になる──。",
         choices: [
           { text: "診断をはじめる", next: 1 }
@@ -123,49 +125,49 @@
         text: "深夜0時、スマホを眺めながら『起きてる？』と打っては消す。",
         choices: [
           { text: "何も言わずにストーリーだけ更新する。", next: 2 },
-          { text: "素直に『起きてる？』と送ってしまう。", badEnd: "それはもうアプローチ。君は“メロ男”じゃなかった。" }
+          { text: "素直に『起きてる？』と送ってしまう。", badReason: 1 }
         ]
       },
       {
         text: "数分後、DMが来た。『ストーリー、いまの？』",
         choices: [
           { text: "『ちがうかも』って濁す。", next: 3 },
-          { text: "『そうだよ』って答える。", badEnd: "“確信”を渡した時点で恋は終わる。" }
+          { text: "『そうだよ』って答える。", badReason: 2 }
         ]
       },
       {
         text: "通話が始まった。ゆるく喋ってるうちに、沈黙が心地よくなる。",
         choices: [
           { text: "眠くなったけど、そのまま繋げておく。", next: 4 },
-          { text: "『ねむ…』ってだけ言って落ちる。", badEnd: "沈黙のあとに無音が来たら、心も切れる。" }
+          { text: "『ねむ…』ってだけ言って落ちる。", badReason: 3 }
         ]
       },
       {
         text: "翌朝、昨日の帰り道の写真をストーリーに上げようとする。",
         choices: [
           { text: "壁だけ、光だけ写ったやつにする。", next: 5 },
-          { text: "誰が写ってるかも分かる写真を使う。", badEnd: "“他の誰か”が見えた瞬間、君は脳内から外れる。" }
+          { text: "誰が写ってるかも分かる写真を使う。", badReason: 4 }
         ]
       },
       {
         text: "『あの場所、雰囲気よかったね』ってDMが来る。",
         choices: [
           { text: "『夢に出てきそうだった』ってだけ返す。", next: 6 },
-          { text: "『また行きたいね』と返す。", badEnd: "その言葉は、誰にでも使える。" }
+          { text: "『また行きたいね』と返す。", badReason: 5 }
         ]
       },
       {
         text: "『夢に出てきそうだった』に『なんで？』って返された。",
         choices: [
           { text: "既読をつけてしばらく放っておく。", next: 7 },
-          { text: "すぐに理由を説明する。", badEnd: "説明した時点で、それは夢ではなくなる。" }
+          { text: "すぐに理由を説明する。", badReason: 6 }
         ]
       },
       {
         text: "朝になって、なんとなくストーリーを開く。",
         choices: [
           { text: "『変な夢見た気がする』ってだけ投稿する。", ending: "🫖 君は完全沼らせメロ男。\nそのストーリーは、誰かのスクショに残る。" },
-          { text: "何も投稿しないで一日を始める。", badEnd: "沈黙は美しい。でも、なにも届かない。" }
+          { text: "何も投稿しないで一日を始める。", badReason: 7 }
         ]
       }
     ];
@@ -203,24 +205,32 @@
             if (sceneIndex !== 0) showPopup("✓ クリア！");
             sceneIndex = choice.next;
             setTimeout(renderScene, 500);
-          } else if (choice.badEnd) {
+          } else if (choice.badReason) {
             document.getElementById("scene").innerText = "\n── BAD END ──\n";
             choices.innerHTML = "";
-            result.innerText = choice.badEnd;
+            result.innerText = badEndTexts[choice.badReason];
             share.style.display = "inline-block";
             share.onclick = () => {
-              const url = encodeURIComponent("https://nimonimonimonimo.github.io/meroi-otoko/");
-              const text = encodeURIComponent("メロい男診断やってみたらBAD ENDだった… #メロ男 #診断ゲーム\n" + url);
+              const text = encodeURIComponent(`メロい男診断やってみたらBAD ENDだった… #メロ男 #診断ゲーム\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
               window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
             };
           } else if (choice.ending) {
             document.getElementById("scene").innerText = "\n── FINAL ──\n";
             choices.innerHTML = "";
-            result.innerText = choice.ending;
+            result.innerText = choice.ending + `
+
+君は言葉で愛を語らない。表情でも約束しない。
+でも、すべての行動が彼女の心を撫でている。
+
+そのやさしさは無自覚かもしれない。
+だけど彼女はもう、君のスクリーンの向こう側で
+君の“余白”をずっと読み取ってる。
+
+おめでとう。君は完全沼らせメロ男、
+誰かの脳内劇場の主演になった。`;
             share.style.display = "inline-block";
             share.onclick = () => {
-              const url = encodeURIComponent(window.location.href);
-              const text = encodeURIComponent("メロい男診断、完全沼らせメロ男に到達した🫖 #メロ男 #診断ゲーム\n" + url);
+              const text = encodeURIComponent(`メロい男診断、完全沼らせメロ男に到達した🫖 #メロ男 #診断ゲーム\nhttps://nimonimonimonimo.github.io/meroi-otoko/`);
               window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
             };
           }
