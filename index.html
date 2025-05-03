@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>メロい男・選択型ノベル診断</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap');
+
     body {
       background-color: #1a1a1a;
       color: #f0f0f0;
@@ -15,50 +17,103 @@
       align-items: center;
       min-height: 100vh;
       padding: 2em;
+      margin: 0;
     }
+
     #container {
-      max-width: 600px;
+      width: 100%;
+      max-width: 480px;
       background: #2a2a2a;
-      padding: 2em;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
+      padding: 2em 1.5em;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+      box-sizing: border-box;
     }
+
     #scene {
-      font-size: 1.2em;
-      margin-bottom: 1em;
-      line-height: 1.8;
+      font-size: 1.1em;
+      margin-bottom: 1.5em;
+      line-height: 1.7;
+      text-align: center;
     }
+
     .choice {
       background: #333;
       color: #fff;
-      padding: 1em;
-      margin: 0.5em 0;
-      border-radius: 8px;
+      padding: 0.9em 1em;
+      margin: 0.6em auto;
+      border-radius: 12px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
     }
+
     .choice:hover {
-      background: #ff8dc7;
+      background: #ffb3d9;
       color: #000;
     }
+
     #result {
-      font-size: 1.4em;
+      font-size: 1.3em;
       margin-top: 2em;
-      color: #ff8dc7;
+      color: #ffb3d9;
       text-align: center;
+      white-space: pre-line;
+    }
+
+    #shareButton {
+      margin-top: 1.5em;
+      background: #1da1f2;
+      color: white;
+      padding: 0.8em 1.2em;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1em;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #loading {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-bottom: 2em;
+      text-align: center;
+    }
+
+    #popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffb3d9;
+      color: #1a1a1a;
+      padding: 1em 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
+      z-index: 999;
+      font-weight: bold;
+      font-size: 1.1em;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <div id="scene"></div>
+    <div id="loading">ローディング中…</div>
+    <div id="scene" style="display:none;"></div>
     <div id="choices"></div>
     <div id="result"></div>
+    <button id="shareButton" style="display: none;">X（旧Twitter）で診断結果をシェア</button>
   </div>
+  <div id="popup">✓ クリア！</div>
 
   <script>
     const story = [
-      {
+    {
         text: "\n\n── メロい男・選択型診断 ──\n\n\n君は気づいていない。\nその一言が、\nその返信が、\n誰かの一日を占領していることに。\n\n選択を間違えればすべてが終わる。\nでも最後までたどり着けたとき、\n君は “完全沼らせメロ男” になる──。",
         choices: [
           { text: "診断をはじめる", next: 1 }
@@ -68,7 +123,7 @@
         text: "深夜0時、スマホを眺めながら『起きてる？』と打っては消す。",
         choices: [
           { text: "何も言わずにストーリーだけ更新する。", next: 2 },
-          { text: "素直に『起きてる？』と送る。", badEnd: "それはもうアプローチ。君は“メロ男”じゃなかった。" }
+          { text: "素直に『起きてる？』と送ってしまう。", badEnd: "それはもうアプローチ。君は“メロ男”じゃなかった。" }
         ]
       },
       {
@@ -88,7 +143,7 @@
       {
         text: "翌朝、昨日の帰り道の写真をストーリーに上げようとする。",
         choices: [
-          { text: "壁だけ写ったやつにする。", next: 5 },
+          { text: "壁だけ、光だけ写ったやつにする。", next: 5 },
           { text: "誰が写ってるかも分かる写真を使う。", badEnd: "“他の誰か”が見えた瞬間、君は脳内から外れる。" }
         ]
       },
@@ -117,36 +172,64 @@
 
     let sceneIndex = 0;
 
+    function showPopup(text) {
+      const popup = document.getElementById("popup");
+      popup.innerText = text;
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 1200);
+    }
+
     function renderScene() {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("scene").style.display = "block";
+
       const s = story[sceneIndex];
       document.getElementById("scene").innerText = s.text;
       const choices = document.getElementById("choices");
       const result = document.getElementById("result");
+      const share = document.getElementById("shareButton");
       result.innerHTML = "";
       choices.innerHTML = "";
+      share.style.display = "none";
+
       s.choices.forEach(choice => {
         const btn = document.createElement("div");
         btn.className = "choice";
         btn.innerText = choice.text;
         btn.onclick = () => {
           if (choice.next !== undefined) {
+            if (sceneIndex !== 0) showPopup("✓ クリア！");
             sceneIndex = choice.next;
-            renderScene();
+            setTimeout(renderScene, 500);
           } else if (choice.badEnd) {
             document.getElementById("scene").innerText = "\n── BAD END ──\n";
             choices.innerHTML = "";
             result.innerText = choice.badEnd;
+            share.style.display = "inline-block";
+            share.onclick = () => {
+              const url = encodeURIComponent("https://nimonimonimonimo.github.io/meroi-otoko/");
+              const text = encodeURIComponent("メロい男診断やってみたらBAD ENDだった… #メロ男 #診断ゲーム\n" + url);
+              window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+            };
           } else if (choice.ending) {
             document.getElementById("scene").innerText = "\n── FINAL ──\n";
             choices.innerHTML = "";
             result.innerText = choice.ending;
+            share.style.display = "inline-block";
+            share.onclick = () => {
+              const url = encodeURIComponent(window.location.href);
+              const text = encodeURIComponent("メロい男診断、完全沼らせメロ男に到達した🫖 #メロ男 #診断ゲーム\n" + url);
+              window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+            };
           }
         };
         choices.appendChild(btn);
       });
     }
 
-    renderScene();
+    setTimeout(renderScene, 1500);
   </script>
 </body>
 </html>
